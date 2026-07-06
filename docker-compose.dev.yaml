@@ -1,0 +1,16 @@
+services:
+  db:
+    container_name: db_marcador_de_lugares
+    image: postgres:15.3-alpine3.17
+    environment:
+      - POSTGRES_USER=${DB_USER}
+      - POSTGRES_PASSWORD=${DB_PASSWORD}
+      - POSTGRES_DB=${DB_NAME}
+    ports:
+      - ${DB_PORT}:${DOCKER_DB_PORT}
+    volumes:
+      #Esta es la carpeta dentro del contenedor donde se persistirán los datos de la base de datos
+      - db_data:/var/lib/postgresql/data
+
+volumes:
+  db_data:
