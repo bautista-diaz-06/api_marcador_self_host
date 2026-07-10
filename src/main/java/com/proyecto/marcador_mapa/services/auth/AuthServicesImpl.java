@@ -1,0 +1,47 @@
+package com.proyecto.marcador_mapa.services.auth;
+
+import com.proyecto.marcador_mapa.dto.request.LoginRequestDTO;
+import com.proyecto.marcador_mapa.dto.request.RegisterRequestDTO;
+import com.proyecto.marcador_mapa.dto.response.UserResponseDTO;
+import com.proyecto.marcador_mapa.entities.Users;
+import com.proyecto.marcador_mapa.mapper.users.UserMapper;
+import com.proyecto.marcador_mapa.repository.userRepository.UserRepository;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Service;
+
+@Service
+public class AuthServicesImpl implements AuthServices {
+
+    private final PasswordEncoder passwordEncoder;
+    private final UserRepository userRepository;
+    private final UserMapper userMapper;
+
+    public AuthServicesImpl(PasswordEncoder passwordEncoder, UserRepository userRepository, UserMapper userMapper) {
+        this.passwordEncoder = passwordEncoder;
+        this.userRepository = userRepository;
+        this.userMapper = userMapper;
+    }
+
+    @Override
+    public UserResponseDTO register(RegisterRequestDTO data) {
+        /**
+         * En la variable que es entidad, guardamos como valor el mapeo del data que viene como parametro
+         *         a un entity, luego a esa entity la guardamos, y esa entity con el valor de lo guardado se mapea a
+         *         el DTO de response para mostrarlo
+         */
+
+        Users userCreated = userMapper.toEntity(data);
+
+        //Como es mutable entonces hasheamos la contraseña y se guarda despues
+        userCreated.setPassword(passwordEncoder.encode(data.getPassword()));
+
+        Users userSaved = this.userRepository.save(userCreated);
+        UserResponseDTO response = userMapper.toResponseDTO(userSaved);
+        return response;
+    }
+
+    @Override
+    public void login(LoginRequestDTO loginData) {
+        //TODO - hay que implementar la logica del login, se usa el passwordEncoder para buscar el match
+    }
+}
