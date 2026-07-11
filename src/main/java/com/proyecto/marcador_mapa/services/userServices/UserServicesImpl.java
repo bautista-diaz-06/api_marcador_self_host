@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class UserServicesImpl implements UserServices {
@@ -24,25 +25,17 @@ public class UserServicesImpl implements UserServices {
     @Override
     @Transactional(readOnly = true)
     public List<UserResponseDTO> getAllUsers() {
-        List<Users> listOfUsers = this.userRepository.findAll();
-
-        if (listOfUsers.isEmpty()) {
-            //mensaje de que está vacia
-            return List.of();
-        }
-
-        return List.of();
+        return userRepository.findAll()
+                .stream()
+                .map(userMapper::toResponseDTO)
+                .toList();
     }
 
     @Override
     @Transactional(readOnly = true)
     public UserResponseDTO getUserByEmail(String email) {
 
-        Users userFinded = this.userRepository.findByEmail(email);
-
-        if (userFinded == null){
-            //retornar que no existe
-        }
+        Users userFinded = this.userRepository.findByEmail(email).orElseThrow(() -> new RuntimeException("Usuario no encontrado"));;
 
         return userMapper.toResponseDTO(userFinded);
     }
