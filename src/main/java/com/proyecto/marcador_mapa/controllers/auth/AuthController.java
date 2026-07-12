@@ -2,6 +2,7 @@ package com.proyecto.marcador_mapa.controllers.auth;
 
 import com.proyecto.marcador_mapa.dto.request.LoginRequestDTO;
 import com.proyecto.marcador_mapa.dto.request.RegisterRequestDTO;
+import com.proyecto.marcador_mapa.dto.response.AuthResponseDTO;
 import com.proyecto.marcador_mapa.dto.response.UserResponseDTO;
 import com.proyecto.marcador_mapa.services.auth.AuthServices;
 import jakarta.validation.Valid;
@@ -27,8 +28,9 @@ public class AuthController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity login(@Valid @RequestBody LoginRequestDTO data) {
-        this.authServices.login(data);
-        return ResponseEntity.ok().build();
+    public ResponseEntity<AuthResponseDTO> login(@Valid @RequestBody LoginRequestDTO data) {
+
+        System.out.println("ENTRÓ AL LOGIN");
+        return ResponseEntity.ok(this.authServices.login(data));
     }
 }

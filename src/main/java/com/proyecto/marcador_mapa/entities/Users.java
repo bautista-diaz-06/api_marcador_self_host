@@ -22,6 +22,12 @@ public class Users implements UserDetails {
 
     private String password;
 
+    //Explicitamente pongo que ek getUsername buscará el email ya que UserDetails busca por username
+    @Override
+    public String getUsername() {
+        return email;
+    }
+
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return List.of();

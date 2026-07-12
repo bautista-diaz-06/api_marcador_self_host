@@ -2,13 +2,16 @@ package com.proyecto.marcador_mapa.services.auth;
 
 import com.proyecto.marcador_mapa.dto.request.LoginRequestDTO;
 import com.proyecto.marcador_mapa.dto.request.RegisterRequestDTO;
+import com.proyecto.marcador_mapa.dto.response.AuthResponseDTO;
 import com.proyecto.marcador_mapa.dto.response.UserResponseDTO;
 import com.proyecto.marcador_mapa.entities.Users;
 import com.proyecto.marcador_mapa.mapper.users.UserMapper;
 import com.proyecto.marcador_mapa.repository.userRepository.UserRepository;
+import com.proyecto.marcador_mapa.security.JwtService;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -19,12 +22,14 @@ public class AuthServicesImpl implements AuthServices {
     private final UserRepository userRepository;
     private final UserMapper userMapper;
     private final AuthenticationManager authenticationManager;
+    private final JwtService jwtService;
 
-    public AuthServicesImpl(PasswordEncoder passwordEncoder, UserRepository userRepository, UserMapper userMapper, AuthenticationManager authenticationManager) {
+    public AuthServicesImpl(PasswordEncoder passwordEncoder, UserRepository userRepository, UserMapper userMapper, AuthenticationManager authenticationManager, JwtService jwtService) {
         this.passwordEncoder = passwordEncoder;
         this.userRepository = userRepository;
         this.userMapper = userMapper;
         this.authenticationManager = authenticationManager;
+        this.jwtService = jwtService;
     }
 
     @Override
@@ -46,10 +51,20 @@ public class AuthServicesImpl implements AuthServices {
     }
 
     @Override
-    public void login(LoginRequestDTO loginData) {
+    public AuthResponseDTO login(LoginRequestDTO loginData) {
+
+        System.out.println("DTO completo: " + loginData);
+        System.out.println("Email recibido: " + loginData.getEmail());
+        System.out.println("Password recibido: " + loginData.getPassword());
+
         Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(
                 loginData.getEmail(),
                 loginData.getPassword()
         ));
+
+        UserDetails user = (UserDetails) authentication.getPrincipal();
+        String token = jwtService.generateToken(user);
+
+        return new AuthResponseDTO(token);
     }
 }
