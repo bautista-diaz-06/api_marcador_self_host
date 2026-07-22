@@ -1,0 +1,26 @@
+services:
+
+  backend:
+    container_name: backend_marcador_de_lugares
+    build: .
+    ports:
+      - "${PORT}:${DOCKER_PORT}"
+    env_file:
+      - .env
+    depends_on:
+      - db
+
+  db:
+    container_name: db_marcador_de_lugares
+    image: postgres:15.3-alpine3.17
+    environment:
+      - POSTGRES_USER=${DB_USER}
+      - POSTGRES_PASSWORD=${DB_PASSWORD}
+      - POSTGRES_DB=${DB_NAME}
+    ports:
+      - ${DB_PORT}:${DOCKER_DB_PORT}
+    volumes:
+      - db_data:/var/lib/postgresql/data
+
+volumes:
+  db_data:
