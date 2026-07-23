@@ -1,0 +1,28 @@
+# Git
+.git
+.gitignore
+
+# IntelliJ
+.idea
+*.iml
+
+# VS Code
+.vscode
+
+# Maven
+target
+
+# Variables de entorno
+.env
+.env.*
+!.env.example
+
+# Documentación
+README.md
+
+# Logs
+*.log
+
+# Archivos temporales del sistema
+.DS_Store
+Thumbs.db
