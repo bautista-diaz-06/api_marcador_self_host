@@ -17,12 +17,12 @@ public class CustomUserDetailsServices implements UserDetailsService {
 
     //Este UserDetails es el que permite que luego el proovedor busque una coincidencia a partir de estos details que le pasamos
     @Override
-    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        System.out.println("Valor recibido en loadUserByUsername: " + username);
+    public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
+        System.out.println("Valor recibido en loadUserByUsername: " + email);
 
         //El username lo tomamos al 'email', dice username porque es el metodo de la implementacion pero no es obligatorio
-        Users foundUser = this.userRepository.findByEmail(username)
-                .orElseThrow(() -> new UsernameNotFoundException("User not found with email: " + username));
+        Users foundUser = this.userRepository.findByEmail(email)
+                .orElseThrow(() -> new UsernameNotFoundException("User not found with email: " + email));
 
         //A pesar de que se espera devolver un UserDetails, nosotros dentro de la entidad Users, ya implementamos
         //la interfaz de UserDetails, entonces como Users ya implementa la interfaz, se puede devolver

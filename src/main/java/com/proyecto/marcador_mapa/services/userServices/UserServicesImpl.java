@@ -1,5 +1,6 @@
 package com.proyecto.marcador_mapa.services.userServices;
 
+import com.proyecto.marcador_mapa.dto.request.UserRequestDTO;
 import com.proyecto.marcador_mapa.dto.response.UserResponseDTO;
 import com.proyecto.marcador_mapa.entities.Users;
 import com.proyecto.marcador_mapa.mapper.users.UserMapper;
@@ -9,7 +10,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.Optional;
 
 @Service
 public class UserServicesImpl implements UserServices {
@@ -31,6 +31,7 @@ public class UserServicesImpl implements UserServices {
                 .toList();
     }
 
+    //Esto es utilizado por el JWT para comprobar el custom
     @Override
     @Transactional(readOnly = true)
     public UserResponseDTO getUserByEmail(String email) {
@@ -47,4 +48,25 @@ public class UserServicesImpl implements UserServices {
 
         this.userRepository.delete(existingUser);
     }
+
+    @Override
+    @Transactional(readOnly = true)
+    public UserResponseDTO myInfo(Users user) {
+        return userMapper.toResponseDTO(user);
+    }
+
+    @Override
+    @Transactional
+    public UserResponseDTO updateUser(UserRequestDTO user, Users users) {
+        users.setUsername(user.getUsername());
+        users.setEmail(user.getEmail());
+
+        //la entity Users es mutable asi que lo podemos guardar
+        Users userUpdated = this.userRepository.save(users);
+
+        UserResponseDTO response = userMapper.toResponseDTO(userUpdated);
+        return response;
+    }
+
+
 }

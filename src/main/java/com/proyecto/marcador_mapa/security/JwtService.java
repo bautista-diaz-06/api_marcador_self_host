@@ -1,6 +1,7 @@
 package com.proyecto.marcador_mapa.security;
 
 
+import com.proyecto.marcador_mapa.entities.Users;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
@@ -24,9 +25,11 @@ public class JwtService {
 
     //Genera el token utilizando el UserDetails el cual tomará el 'username' según el campo que nosotros hayamos puesto
     //en el CustomUserDetails
-    public String generateToken(UserDetails user){
+    public String generateToken(UserDetails userDetails){
+        Users user = (Users) userDetails;
+
         return Jwts.builder()
-                .subject(user.getUsername())
+                .subject(user.getEmail())
                 .issuedAt(new Date())
                 .expiration(new Date(System.currentTimeMillis() + expiration))
                 .signWith(getSignInKey(), Jwts.SIG.HS256)
@@ -62,13 +65,13 @@ public class JwtService {
     }
 
     //Verifica si el token es valido
-    public boolean isTokenValid(String token, UserDetails user) {
+    public boolean isTokenValid(String token, Users user) {
 
         //obtiene el 'username' en nuestro caso el email del token
         String username = getEmailFromToken(token);
 
         //verifica si es username o el campo que configuramos es el mismo que se pasa para verificar si el token es valido
-        return username.equals(user.getUsername())
+        return username.equals(user.getEmail())
                 && !isTokenExpired(token);
     }
 

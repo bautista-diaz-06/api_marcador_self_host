@@ -14,6 +14,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class AuthServicesImpl implements AuthServices {
@@ -33,6 +34,7 @@ public class AuthServicesImpl implements AuthServices {
     }
 
     @Override
+    @Transactional
     public UserResponseDTO register(RegisterRequestDTO data) {
         /**
          * En la variable que es entidad, guardamos como valor el mapeo del data que viene como parametro
@@ -51,6 +53,7 @@ public class AuthServicesImpl implements AuthServices {
     }
 
     @Override
+    @Transactional
     public AuthResponseDTO login(LoginRequestDTO loginData) {
 
         System.out.println("DTO completo: " + loginData);

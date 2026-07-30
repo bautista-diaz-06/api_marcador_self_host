@@ -25,7 +25,7 @@ public class Users implements UserDetails {
     //Explicitamente pongo que ek getUsername buscará el email ya que UserDetails busca por username
     @Override
     public String getUsername() {
-        return email;
+        return username;
     }
 
     @Override
