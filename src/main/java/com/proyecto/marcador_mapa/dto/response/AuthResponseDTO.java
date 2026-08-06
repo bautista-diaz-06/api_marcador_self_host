@@ -6,5 +6,9 @@ import lombok.Data;
 @Data
 @AllArgsConstructor
 public class AuthResponseDTO {
+    // Token de acceso para consumir endpoints protegidos.
     private String token;
+
+    // Token de refresco para solicitar nuevos tokens sin reloguearse.
+    private String refreshToken;
 }

@@ -1,6 +1,7 @@
 package com.proyecto.marcador_mapa.controllers.auth;
 
 import com.proyecto.marcador_mapa.dto.request.LoginRequestDTO;
+import com.proyecto.marcador_mapa.dto.request.RefreshTokenRequestDTO;
 import com.proyecto.marcador_mapa.dto.request.RegisterRequestDTO;
 import com.proyecto.marcador_mapa.dto.response.AuthResponseDTO;
 import com.proyecto.marcador_mapa.dto.response.UserResponseDTO;
@@ -29,8 +30,13 @@ public class AuthController {
 
     @PostMapping("/login")
     public ResponseEntity<AuthResponseDTO> login(@Valid @RequestBody LoginRequestDTO data) {
-
-        System.out.println("ENTRÓ AL LOGIN");
+        // Login: devuelve access token + refresh token.
         return ResponseEntity.ok(this.authServices.login(data));
+    }
+
+    @PostMapping("/refresh")
+    public ResponseEntity<AuthResponseDTO> refresh(@Valid @RequestBody RefreshTokenRequestDTO data) {
+        // Refresh: renueva el par de tokens con un refresh token válido.
+        return ResponseEntity.ok(this.authServices.refreshToken(data));
     }
 }
