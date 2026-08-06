@@ -11,11 +11,17 @@ import org.springframework.stereotype.Service;
 
 import javax.crypto.SecretKey;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 import io.jsonwebtoken.Claims;
 import java.util.function.Function;
 
 @Service
 public class JwtService {
+
+    private static final String TOKEN_TYPE_CLAIM = "token_type";
+    private static final String ACCESS_TOKEN_TYPE = "access";
+    private static final String REFRESH_TOKEN_TYPE = "refresh";
 
     @Value("${jwt.secret}")
     private String secretKey;
@@ -23,15 +29,37 @@ public class JwtService {
     @Value("${jwt.expiration}")
     private Long expiration;
 
+    @Value("${jwt.refresh-expiration}")
+    private Long refreshExpiration;
+
     //Genera el token utilizando el UserDetails el cual tomará el 'username' según el campo que nosotros hayamos puesto
     //en el CustomUserDetails
     public String generateToken(UserDetails userDetails){
+        // Se mantiene por compatibilidad con código existente y devuelve access token.
+        return generateAccessToken(userDetails);
+    }
+
+    public String generateAccessToken(UserDetails userDetails) {
+        // Token corto para autenticar requests en endpoints protegidos.
         Users user = (Users) userDetails;
+        return buildToken(user, expiration, ACCESS_TOKEN_TYPE);
+    }
+
+    public String generateRefreshToken(UserDetails userDetails) {
+        // Token largo para renovar sesión sin volver a pedir credenciales.
+        Users user = (Users) userDetails;
+        return buildToken(user, refreshExpiration, REFRESH_TOKEN_TYPE);
+    }
+
+    private String buildToken(Users user, Long tokenExpiration, String tokenType) {
+        Map<String, Object> claims = new HashMap<>();
+        claims.put(TOKEN_TYPE_CLAIM, tokenType);
 
         return Jwts.builder()
+                .claims(claims)
                 .subject(user.getEmail())
                 .issuedAt(new Date())
-                .expiration(new Date(System.currentTimeMillis() + expiration))
+                .expiration(new Date(System.currentTimeMillis() + tokenExpiration))
                 .signWith(getSignInKey(), Jwts.SIG.HS256)
                 .compact();
     }
@@ -72,7 +100,23 @@ public class JwtService {
 
         //verifica si es username o el campo que configuramos es el mismo que se pasa para verificar si el token es valido
         return username.equals(user.getEmail())
+                && isAccessToken(token)
                 && !isTokenExpired(token);
+    }
+
+    public boolean isRefreshToken(String token) {
+        return REFRESH_TOKEN_TYPE.equals(extractClaim(token, claims -> claims.get(TOKEN_TYPE_CLAIM, String.class)))
+                && !isTokenExpired(token);
+    }
+
+    public boolean isRefreshTokenValid(String token, Users user) {
+        String username = getEmailFromToken(token);
+        return username.equals(user.getEmail())
+                && isRefreshToken(token);
+    }
+
+    private boolean isAccessToken(String token) {
+        return ACCESS_TOKEN_TYPE.equals(extractClaim(token, claims -> claims.get(TOKEN_TYPE_CLAIM, String.class)));
     }
 
     //permite crear el encriptado a nuestra clave secreta
