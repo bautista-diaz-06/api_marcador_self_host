@@ -2,7 +2,9 @@ services:
 
   backend:
     container_name: backend_marcador_de_lugares
-    build: .
+    build:
+      context: .
+      dockerfile: Dockerfile.native
     ports:
       - "${PORT}:${DOCKER_PORT}"
     env_file:
