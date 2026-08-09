@@ -1,0 +1,26 @@
+FROM maven:3.9-eclipse-temurin-21 AS build
+
+WORKDIR /app
+
+# Copiar pom.xml
+COPY pom.xml .
+COPY mvnw .
+COPY .mvn ./.mvn
+
+# Descargar dependencias
+RUN mvn dependency:go-offline || true
+
+# Copiar código fuente
+COPY src ./src
+
+# Compilar a nativo
+RUN mvn clean native:compile -DskipTests
+
+# Etapa 2: Runtime ligero
+FROM debian:bookworm-slim
+
+WORKDIR /app
+
+# Instalar librerías que necesita el ejecutable nativo
+RUN apt-get update && apt-get install -y libz1 && rm -rf /var/lib/apt/lists/*
+
